@@ -79,3 +79,15 @@ jobs:
       uses: github/codeql-action/analyze@v3
       with:
         category: "/language:${{matrix.language}}"
+
+    - name: Fail if Critical Security Issues Found
+      run: |
+        CRITICAL_COUNT=$(jq '[.runs[].results[] | select(.rule.properties."security-severity" >= 9)] | length' results.sarif)
+        if [ "$CRITICAL_COUNT" -gt 0 ]; then
+          echo "❌ Critical security issues found: $CRITICAL_COUNT"
+          exit 1
+        else
+          echo "✅ No critical security issues found."
+        fi
+      working-directory: ${{ github.workspace }}
+
