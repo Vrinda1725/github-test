@@ -52,7 +52,7 @@ jobs:
             exit 1
           fi
           
-          CRITICAL_COUNT=$(jq '[.runs[].results[] | select(.rule.properties."security-severity" | tonumber >= 9)] | length' "$SARIF_FILE")
+          CRITICAL_COUNT=$(jq '[.runs[].results[] | select(.rule.properties."security-severity" and (.rule.properties."security-severity" | tonumber >= 9))] | length' "$SARIF_FILE")
 
           if [ "$CRITICAL_COUNT" -gt 0 ]; then
             echo "❌ Critical security issues found: $CRITICAL_COUNT"
