@@ -80,14 +80,25 @@ jobs:
       with:
         category: "/language:${{matrix.language}}"
 
-    - name: Fail if Critical Security Issues Found
+    - name: Find and Fail on Critical Security Issues
       run: |
-        CRITICAL_COUNT=$(jq '[.runs[].results[] | select(.rule.properties."security-severity" >= 9)] | length' results.sarif)
+        SARIF_FILE=$(find ${{ github.workspace }} -name "*.sarif" | head -n 1)
+        echo "Using SARIF file: $SARIF_FILE"
+    
+        if [ ! -f "$SARIF_FILE" ]; then
+          echo "Error: No SARIF file found!"
+          exit 1
+        fi
+    
+        CRITICAL_COUNT=$(jq '[.runs[].results[] | select(.rule.properties."security-severity" >= 9)] | length' "$SARIF_FILE")
+    
         if [ "$CRITICAL_COUNT" -gt 0 ]; then
           echo "❌ Critical security issues found: $CRITICAL_COUNT"
           exit 1
         else
           echo "✅ No critical security issues found."
         fi
-      working-directory: ${{ github.workspace }}
+      shell: bash
+
+
 
