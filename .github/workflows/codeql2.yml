@@ -39,12 +39,12 @@ jobs:
           upload: false
           category: "/language:${{ matrix.language }}"
 
-      - name: List SARIF files
-        run: find . -name "*.sarif"
-
+      - name: Find SARIF file
+        run: find ../results -name "*.sarif"
+          
       - name: Fail if Critical Security Issues Found
         run: |
-          SARIF_FILE=$(find . -name "*.sarif" | head -n 1)
+          SARIF_FILE=$(find ../results -name "*.sarif" | head -n 1)
           echo "Using SARIF file: $SARIF_FILE"
           
           if [ -z "$SARIF_FILE" ]; then
@@ -61,3 +61,4 @@ jobs:
             echo "✅ No critical security issues found."
           fi
         shell: bash
+
